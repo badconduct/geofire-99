@@ -21,8 +21,6 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-.prettierrc
-hit_counts.json
 # directories
 /node_modules/
 /user_sites/
