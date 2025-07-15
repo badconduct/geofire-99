@@ -1,6 +1,15 @@
 // Retro Star Trail Effect for GeoFire '99
 // Compatible with Internet Explorer 6+ and other old browsers.
 (function () {
+  var path = window.location.pathname.toLowerCase();
+  var isRoot = path.slice(-1) === '/';
+  var isIndex = path.indexOf('/index.html', path.length - 11) !== -1;
+
+  // Only run the script on the root of the site or on index.html
+  if (!isRoot && !isIndex) {
+    return;
+  }
+
   // This object will be globally accessible for setTimeout calls.
   window.GeoFire_StarUtils = {
     init: function () {
@@ -45,8 +54,6 @@
         s.style.width = '1em';
         s.style.height = '1em';
         s.style.lineHeight = '1em';
-        s.style.pointerEvents = 'none';
-        s.style.cursor = 'none';
         document.body.appendChild(s);
         this.stars[i] = s;
       }

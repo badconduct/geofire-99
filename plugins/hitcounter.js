@@ -47,7 +47,6 @@ hitCounter.getSnippet = function (username) {
  */
 hitCounter.getImage = function (siteUsername, referer, res) {
   const userLocation = storage.findUser(siteUsername);
-  // Handle case where user might not exist, send a blank/error image
   if (!userLocation) {
     const svg = `<svg width="88" height="18" xmlns="http://www.w3.org/2000/svg" />`;
     res.setHeader('Content-Type', 'image/svg+xml');
@@ -58,35 +57,34 @@ hitCounter.getImage = function (siteUsername, referer, res) {
 
   const counts = _getHitCounts();
   const userSitePrefix = `/${userLocation.neighborhoodCode}/${siteUsername}`;
+  const indexPageKey = userSitePrefix + '/index.html';
 
-  // The key for our hit count. It should be unique per page.
-  // Fallback to a key for the entire site if referer is invalid.
-  let pageKey = userSitePrefix + '/';
+  let shouldIncrement = false;
 
   if (referer) {
     try {
       const refererUrl = new URL(referer);
-      // Ensure the referer is for this specific user's site to prevent misuse
+      // Ensure the referer is from this specific user's site
       if (refererUrl.pathname && refererUrl.pathname.startsWith(userSitePrefix)) {
-        pageKey = refererUrl.pathname;
+        const relativePath = refererUrl.pathname.substring(userSitePrefix.length);
+        // Only increment if the path is the root directory or the index.html page itself.
+        if (relativePath === '' || relativePath === '/' || relativePath === 'index.html') {
+          shouldIncrement = true;
+        }
       }
     } catch (e) {
-      // If the referer is not a valid URL, log it but don't crash.
       console.warn(
-        `${LOG_PREFIX} Could not parse referer URL: '${referer}'. Falling back to site-wide count for ${siteUsername}.`
+        `${LOG_PREFIX} Could not parse referer URL: '${referer}'. Not incrementing count for ${siteUsername}.`
       );
     }
   }
 
-  // Normalize directory access (e.g., /area51/user/) to point to its index page
-  if (pageKey.endsWith('/')) {
-    pageKey += 'index.html';
+  if (shouldIncrement) {
+    counts[indexPageKey] = (counts[indexPageKey] || 0) + 1;
+    _saveHitCounts(counts);
   }
 
-  counts[pageKey] = (counts[pageKey] || 0) + 1;
-  _saveHitCounts(counts);
-
-  const countString = counts[pageKey].toString().padStart(6, '0');
+  const countString = (counts[indexPageKey] || 0).toString().padStart(6, '0');
   const svg = `<svg width="88" height="18" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#000" /><text x="4" y="14" font-family="Monospace, Courier New" font-size="16" fill="#00FF00">${countString}</text></svg>`;
 
   res.setHeader('Content-Type', 'image/svg+xml');

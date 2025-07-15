@@ -69,10 +69,14 @@ window.GeoFire.components = window.GeoFire.components || {};
       var entry = chatHistory[i];
       if (entry.from === 'user') {
         historyHtml +=
-          '<p style="margin: 5px 0;"><b>You:</b> ' + entry.message.replace(/</g, '&lt;') + '</p>';
+          '<p style="margin: 5px 0; word-wrap: break-word;"><b>You:</b> ' +
+          entry.message.replace(/</g, '&lt;') +
+          '</p>';
       } else {
         var aiMessage =
-          '<p style="margin: 5px 0;"><b>AI:</b> ' + entry.message.replace(/</g, '&lt;') + '</p>';
+          '<p style="margin: 5px 0; word-wrap: break-word;"><b>AI:</b> ' +
+          entry.message.replace(/</g, '&lt;') +
+          '</p>';
         if (entry.files && entry.files.length > 0) {
           aiMessage +=
             '<p style="margin: 2px 0 2px 10px;"><i>Modified Files:</i></p><ul style="margin:0 0 5px 30px; padding:0; list-style-type:square;">';

@@ -1,6 +1,15 @@
 // Retro Matrix Trail Effect for GeoFire '99
 // Compatible with Internet Explorer 6+ and other old browsers.
 (function () {
+  var path = window.location.pathname.toLowerCase();
+  var isRoot = path.slice(-1) === '/';
+  var isIndex = path.indexOf('/index.html', path.length - 11) !== -1;
+
+  // Only run the script on the root of the site or on index.html
+  if (!isRoot && !isIndex) {
+    return;
+  }
+
   // This object will be globally accessible for setTimeout calls.
   window.GeoFire_MatrixUtils = {
     init: function () {
@@ -45,8 +54,6 @@
         c.style.width = '1em';
         c.style.height = '1em';
         c.style.lineHeight = '1em';
-        c.style.pointerEvents = 'none';
-        c.style.cursor = 'none';
         document.body.appendChild(c);
         this.chars[i] = c;
       }
