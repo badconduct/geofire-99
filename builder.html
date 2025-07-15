@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>GeoFire '99 - Site Builder</title>
+    <style type="text/css">
+      /* --- Global Styles & Resets for IE6 --- */
+      html {
+        height: 100%;
+      }
+
+      body {
+        background: #ffffcc; /* Light Yellow - to match reference */
+        font-family: 'MS Sans Serif', 'Geneva', 'Arial', sans-serif;
+        font-size: 8pt;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      body.portal-body {
+        /* overflow property moved to #root for IE6 compatibility */
+      }
+
+      body.builder-body {
+        background: #008080; /* Teal for builder desktop */
+        /* overflow property moved to #root for IE6 compatibility */
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      p {
+        margin: 0;
+        padding: 0;
+      }
+
+      a {
+        color: #0000ff;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      a:hover {
+        color: #ff0000;
+      }
+
+      form {
+        margin: 0;
+        padding: 0;
+      }
+
+      /* --- Retro UI Elements --- */
+      .retro-window {
+        background: #c0c0c0; /* Silver */
+        border-top: 2px solid #ffffff;
+        border-left: 2px solid #ffffff;
+        border-right: 2px solid #000000;
+        border-bottom: 2px solid #000000;
+        padding: 2px;
+        /* box-sizing removed for IE6 compatibility */
+      }
+
+      .retro-window-title-bar {
+        background: #000080; /* Dark Blue */
+        color: #ffffff;
+        font-weight: bold;
+        padding: 3px 5px;
+        white-space: nowrap;
+      }
+
+      .retro-window-title-bar td {
+        color: #ffffff;
+      }
+
+      .retro-window-title-bar-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .retro-window-body {
+        margin: 4px;
+      }
+
+      .retro-window-body-nopad {
+        margin: 4px;
+        padding: 0;
+      }
+
+      .retro-button {
+        background: #c0c0c0;
+        border-top: 1px solid #ffffff;
+        border-left: 1px solid #ffffff;
+        border-right: 1px solid #000000;
+        border-bottom: 1px solid #000000;
+        padding: 4px 12px;
+        font-family: 'MS Sans Serif', 'Geneva', 'Arial', sans-serif;
+        font-size: 8pt;
+        cursor: pointer;
+      }
+
+      .retro-button:active {
+        border-top: 1px solid #000000;
+        border-left: 1px solid #000000;
+        border-right: 1px solid #ffffff;
+        border-bottom: 1px solid #ffffff;
+      }
+
+      .retro-input,
+      .retro-textarea,
+      .retro-select {
+        border: 2px inset #c0c0c0;
+        border-color: #808080 #fff #fff #808080;
+        background: #fff;
+        padding: 2px;
+        font-family: 'MS Sans Serif', 'Geneva', 'Arial', sans-serif;
+        font-size: 8pt;
+      }
+
+      .retro-textarea {
+        width: 98%;
+        height: 100px;
+        resize: none;
+      }
+
+      .inset-box {
+        border: 2px inset #c0c0c0;
+        border-color: #808080 #fff #fff #808080;
+        background: #fff;
+        padding: 4px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .status-bar {
+        border: 1px solid #808080;
+        border-top-color: #fff;
+        border-left-color: #fff;
+        padding: 2px 4px;
+        margin-top: 2px;
+      }
+
+      /* --- Layout --- */
+      #root {
+        height: 100%;
+      }
+
+      /* IE6 Compatibility: Move overflow from body to #root */
+      body.portal-body #root {
+        overflow: auto;
+      }
+      body.builder-body #root {
+        overflow: hidden;
+      }
+
+      /* --- Portal Specific --- */
+      .portal-page-container {
+        width: 780px;
+        margin: 0 auto;
+        padding: 5px;
+      }
+
+      .portal-logo-container {
+        border: 2px inset #000080;
+        border-color: #000050 #8080c0 #8080c0 #000050;
+        padding: 2px;
+        background: #c0c0c0;
+      }
+
+      .portal-main-nav {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        margin: 5px 0;
+        padding: 5px 0;
+      }
+
+      .portal-main-nav-item {
+        background-color: #000080; /* Dark Blue */
+        color: white;
+        padding: 10px;
+        text-align: left;
+        vertical-align: middle;
+        cursor: pointer;
+        border-right: 1px solid #ffffcc;
+      }
+
+      .portal-main-nav-item h3 {
+        color: yellow;
+        font-size: 10pt;
+      }
+
+      .portal-main-nav-item a {
+        color: yellow;
+      }
+
+      .info-bar {
+        background-color: #ffff99;
+        border: 1px solid black;
+        padding: 5px;
+        text-align: center;
+        margin: 5px 0;
+      }
+
+      .content-box {
+        width: 100%;
+        margin-bottom: 10px;
+        border: 1px solid black;
+      }
+
+      .content-box-header-blue,
+      .content-box-header-green {
+        color: white;
+        font-weight: bold;
+        padding: 3px 5px;
+      }
+
+      .content-box-header-blue {
+        background-color: #000080;
+      }
+
+      .content-box-header-green {
+        background-color: #009933;
+      }
+
+      .content-box-body {
+        padding: 8px;
+        background: white;
+      }
+
+      .neighborhoods-list-item {
+        margin-bottom: 10px;
+      }
+
+      .neighborhoods-list-item p {
+        margin: 2px 0 2px 20px;
+        font-style: italic;
+      }
+
+      .neighborhoods-list-item ul {
+        margin: 2px 0 2px 20px;
+        padding: 0;
+        list-style-type: square;
+      }
+
+      .neighborhoods-list-item b {
+        font-size: 10pt;
+      }
+
+      .neighborhoods-list-item span {
+        font-size: 7pt;
+        color: #555;
+      }
+
+      .portal-footer {
+        text-align: center;
+        padding: 10px;
+        border-top: 1px solid #000;
+        font-size: 7pt;
+      }
+
+      /* --- Builder Specific --- */
+      .builder-header {
+        padding: 5px;
+        background: #c0c0c0;
+        border-bottom: 2px solid #000000;
+        border-top: 2px solid #ffffff;
+      }
+      .builder-content {
+        position: relative;
+        padding: 2px; /* Desktop background */
+        width: 100%;
+        height: 100%;
+        /* box-sizing removed for IE6 compatibility */
+      }
+
+      #main-preview-frame {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #fff;
+      }
+
+      .builder-editor {
+        font-family: 'Courier New', monospace;
+        font-size: 9pt;
+        width: 100%;
+        height: 100%;
+        /* box-sizing removed for IE6 compatibility */
+      }
+
+      .file-explorer-link {
+        color: #000000;
+        text-decoration: none;
+      }
+      .file-explorer-link:hover {
+        text-decoration: underline;
+      }
+
+      .file-explorer-actions {
+        font-size: 7pt;
+        margin-left: 8px;
+        white-space: nowrap;
+      }
+
+      .file-explorer-actions a {
+        color: #0000ff;
+        text-decoration: none;
+      }
+
+      .file-explorer-actions a:hover {
+        text-decoration: underline;
+      }
+
+      /* --- Draggable Pop-up Windows (Win98 Style) --- */
+      .popup-window {
+        position: absolute;
+        background: #c0c0c0;
+        border-top: 2px solid #ffffff;
+        border-left: 2px solid #ffffff;
+        border-right: 2px solid #000000;
+        border-bottom: 2px solid #000000;
+        z-index: 10;
+        padding: 2px;
+        overflow: hidden; /* Changed from auto to hidden to contain the inner table. */
+      }
+
+      .popup-header {
+        background: #000080;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 3px 5px;
+        cursor: move;
+        /* user-select removed for IE6 compatibility */
+      }
+
+      .popup-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .popup-title img {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .popup-close-button {
+        background: #c0c0c0;
+        border: 1px solid;
+        border-color: #fff #000 #000 #fff;
+        width: 16px;
+        height: 16px;
+        font-family: 'MS Sans Serif', 'Geneva', 'Arial', sans-serif;
+        font-size: 10pt;
+        font-weight: bold;
+        line-height: 12px;
+        text-align: center;
+        padding: 0;
+        cursor: pointer;
+        color: #000;
+      }
+
+      .popup-close-button:active {
+        border-color: #000 #fff #fff #000;
+      }
+
+      .popup-content {
+        padding: 5px;
+        /* width/height removed for IE6 compatibility, the parent TD handles sizing. */
+      }
+    </style>
+  </head>
+  <body class="builder-body">
+    <div id="root"></div>
+
+    <script type="text/javascript" src="/lib/utils.js"></script>
+    <script type="text/javascript" src="/components/common.js"></script>
+
+    <!-- Builder modules - must be loaded before the main builder.js coordinator -->
+    <script type="text/javascript" src="/components/builder/ai_assistant.js"></script>
+    <script type="text/javascript" src="/components/builder/code_editor.js"></script>
+    <script type="text/javascript" src="/components/builder/file_manager.js"></script>
+    <script type="text/javascript" src="/components/builder/plugin_manager.js"></script>
+    <script type="text/javascript" src="/components/builder/image_previewer.js"></script>
+
+    <!-- Main Builder Coordinator - Load last -->
+    <script type="text/javascript" src="/components/builder.js"></script>
+
+    <script type="text/javascript">
+      // Builder-specific initialization script
+      window.GeoFire = window.GeoFire || {};
+      (function () {
+        var G = window.GeoFire;
+        G.state = {
+          siteData: null,
+          loggedInSiteData: null,
+          isThinking: false,
+          activeFilePath: 'index.html',
+          params: {}
+        };
+        G.API_URL = '/api';
+
+        function initBuilder() {
+          // --- IE6 Compatibility Fix ---
+          // The full site data is no longer stored in a cookie to avoid size limits (4KB).
+          // Instead, we read a smaller cookie containing only authentication details,
+          // then make an API call to fetch the full, up-to-date site data.
+          var savedAuthDataString = G.utils.readCookie('geoFireBuilderData');
+          if (!savedAuthDataString) {
+            alert('Could not find site data. Returning to portal.');
+            window.location.href = '/';
+            return;
+          }
+
+          try {
+            var authData = eval('(' + savedAuthDataString + ')'); // Use eval for IE6 JSON parsing
+            if (!authData || !authData.username || !authData.passwordHash) {
+              throw new Error('Incomplete auth data.');
+            }
+
+            // Fetch the full site data from the server using the auth hash
+            G.utils.ajax(
+              {
+                method: 'POST',
+                url: G.API_URL + '/login',
+                data: {
+                  username: authData.username,
+                  passwordHash: authData.passwordHash
+                }
+              },
+              function (err, data) {
+                if (err || !data.success) {
+                  alert('Your session has expired or is invalid. Please sign in again.');
+                  G.utils.createCookie('geoFireBuilderData', '', -1); // Clear bad cookie
+                  window.location.href = '/';
+                } else {
+                  // Successfully fetched full site data
+                  G.state.siteData = data.siteData;
+                  G.state.loggedInSiteData = data.siteData; // Keep consistent
+
+                  // Render the main builder UI
+                  if (
+                    G.components &&
+                    G.components.builder &&
+                    typeof G.components.builder.render === 'function'
+                  ) {
+                    document.getElementById('root').innerHTML = G.components.builder.render();
+                    G.components.builder.attachEvents();
+                  } else {
+                    alert('A critical builder component failed to load.');
+                  }
+                }
+              }
+            );
+          } catch (e) {
+            alert(
+              'Error loading site data from cookie. It might be corrupted. Returning to portal.'
+            );
+            G.utils.createCookie('geoFireBuilderData', '', -1); // Clear bad cookie
+            window.location.href = '/';
+          }
+        }
+
+        initBuilder();
+      })();
+    </script>
+  </body>
+</html>
