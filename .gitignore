@@ -23,3 +23,4 @@ dist-ssr
 *.sln
 # directories
 /node_modules/
+/user_sites/
