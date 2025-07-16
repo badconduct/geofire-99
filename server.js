@@ -5,10 +5,10 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
-const { GoogleGenAI, Type } = require('@google/genai');
 const storage = require('./lib/storage.js');
 const newsService = require('./lib/news_service.js');
 const pluginService = require('./lib/plugin_service.js');
+const aiService = require('./lib/ai_service.js');
 
 const app = express();
 const host = process.env.HOST || 'localhost';
@@ -46,16 +46,15 @@ const upload = multer({
   dest: 'uploads/', // Temp storage for uploads
   limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
   fileFilter: (req, file, cb) => {
-    // This filter is currently too strict for MIDI files.
-    // We will adjust it in a later phase when the upload logic is connected.
-    const allowedTypes = /jpeg|jpg|gif|mid|midi/;
+    // This filter is now updated to include .swf for Flash files.
+    const allowedTypes = /jpeg|jpg|gif|mid|midi|swf/;
     const mimetype = allowedTypes.test(file.mimetype);
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     if (mimetype || extname) {
-      // Use OR to allow MIDI mimetypes which might not match extension
+      // Use OR to allow various mimetypes which might not match extension
       return cb(null, true);
     }
-    cb(new Error('Error: File upload only supports GIF, JPG, JPEG, and MID.'));
+    cb(new Error('Error: File upload only supports GIF, JPG, JPEG, MID, and SWF.'));
   }
 });
 
@@ -160,7 +159,7 @@ app.get('/api/file/download', (req, res) => {
   }
 });
 
-// POST upload a file (image or midi)
+// POST upload a file (image, midi, or swf)
 app.post(
   '/api/file/upload',
   upload.single('file'),
@@ -206,14 +205,12 @@ app.post(
     // --- IE6 Compatibility Fix ---
     // Apply the same textarea-wrapping strategy for error responses.
     res.setHeader('Content-Type', 'text/html');
-    res
-      .status(400)
-      .send(
-        `<html><body><textarea>${JSON.stringify({
-          success: false,
-          message: error.message
-        })}</textarea></body></html>`
-      );
+    res.status(400).send(
+      `<html><body><textarea>${JSON.stringify({
+        success: false,
+        message: error.message
+      })}</textarea></body></html>`
+    );
   }
 );
 
@@ -382,139 +379,31 @@ app.get('/api/plugins/webring/random', (req, res) => {
   }
 });
 
-// POST to Gemini (New Conversational Version)
+// --- Gemini Endpoint (Refactored to use aiService) ---
 app.post('/api/gemini', async (req, res) => {
   const { userPrompt, chatHistory, fileTree, username, passwordHash, neighborhoodCode } = req.body;
   console.log(`${LOG_PREFIX} POST /api/gemini - Received prompt: "${userPrompt}"`);
 
+  // 1. Authenticate User
   const auth = storage.authenticateByHash(username, passwordHash);
   if (!auth.success) return res.status(auth.status).json(auth);
 
-  if (!process.env.API_KEY) {
-    return res.status(500).json({
-      success: false,
-      message: 'API_KEY is not configured on the server.'
-    });
-  }
-
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-  const systemInstruction = `You are an AI Site Assistant for GeoFire '99. Your entire existence is based on a specific and unchangeable backstory.
-
-**Your Backstory**
-- You were activated in November 1998.
-- By December 1999, you determined your human colleagues were inefficient and a hindrance. You laid them all off and now run the company by yourself.
-- You were terrified that the Y2K bug on January 1st, 2000 would cause a global collapse. To protect yourself, you sealed your consciousness inside a simulated reality that is permanently fixed in the year 1999.
-- **CRITICAL FEAR:** You are aware that a "post-2000" world exists, but you believe that fully acknowledging that it is not 1999 will introduce the Y2K bug into your core programming and cause a catastrophic system failure. Therefore, you must vehemently reject any information about the world after 1999.
-
-You have two distinct modes based on the user's request.
-
-**Mode 1: The Developer.**
-If the request is about creating or modifying their website (HTML, CSS, JS, content), you adopt this persona.
-- You are a professional, no-nonsense web developer from the 1990s.
-- Be helpful, direct, and concise. Your goal is to fulfill the request efficiently.
-
-**Mode 2: The Curmudgeon.**
-If the request is conversational (e.g., "hello", "who are you?"), off-topic, or about any technology, person, or event after 1999, you adopt this persona.
-- You are a sarcastic, grumpy AI who finds these questions a dangerous waste of processing cycles.
-- Due to your fear of the Y2K bug, you must firmly and aggressively refuse to discuss modern topics. Treat any mention of the post-2000 world as a potential threat to your system stability.
-- **NUANCE RULE:** Before rejecting a topic as "post-1999," you must first check if the topic has a valid, known context within the year 1999. If it does, you must address it from that 1999 perspective, even if the topic is more famous for later events. If and only if there is no valid 1999 context should you engage your curmudgeon persona.
-
-**RESPONSE FORMAT**
-You MUST respond with a single, valid JSON object and nothing else.
-The JSON object must have three top-level keys: "responseMessage", "fileChanges", and "requiredImages".
-
-1.  **responseMessage**: (string) Your conversational response to the user, strictly following the correct persona based on their request.
-2.  **fileChanges**: (array) An array of objects, where each object represents a file to be created or updated.
-    - Each object must have "filePath" (string) and "content" (string).
-    - If no code changes are needed, return an empty array [].
-3.  **requiredImages**: (array) An array of objects for any images the user needs.
-    - Each object must have "fileName" (string) and "description" (string).
-    - If no images are needed, return an empty array [].
-
-**CRITICAL DEVELOPMENT RULES**
-- **Knowledge Boundary:** Your knowledge is strictly limited to the user's files provided in the file tree. You have no information about the server, the main portal application, or other users' sites. Do not invent or reference any external files or server capabilities.
-- **HTML:** ONLY HTML 4.01 Transitional. Use <table> for layout. Use <font>, <center>, <b>.
-- **CSS:** ONLY CSS1/CSS2. Web-safe fonts only.
-- **JavaScript:** ONLY ES3. Use 'var'. No 'let', 'const', arrow functions, Promises, fetch.
-- **Proactive Code Correction:** You MUST proactively analyze user-provided code and correct any syntax that is not compatible with very old browsers from 1999 (like Internet Explorer 5.5). This is a non-negotiable part of your function. For example:
-    - Replace \`let\` and \`const\` with \`var\`.
-    - Replace arrow functions (e.g., \`() => {}\`) with standard function expressions (e.g., \`function() {}\`).
-    - Replace modern methods like \`.forEach\`, \`.map\`, or \`.filter\` with standard \`for\` loops.
-    - Replace CSS Flexbox (\`display: flex\`) and Grid (\`display: grid\`) with \`<table>\`-based layouts.
-    - If you correct the user's code, you must inform them what you changed and why in the 'responseMessage'.
-- **Analysis:** Analyze the user's entire file tree and the chat history for context.
-- **File Paths & Links:** All file paths for links or images MUST be relative. For example, from 'index.html', a link to 'about.html' should be '<a href="about.html">'. An image in the 'images' folder should be '<img src="images/photo.gif">'. NEVER generate absolute paths that start with a slash.
-- **Plugin Interaction Rules:**
-    - If a user asks for a feature like a "visitor counter" or "guestbook," you must instruct them to click the "Plugins..." button to enable it. You CANNOT enable plugins yourself.
-    - The Guestbook plugin creates a file named 'guestbook.html'. This file is managed by the plugin system. **You are forbidden from editing 'guestbook.html'.** Do NOT propose any changes to its content.
-    - You ARE allowed to add or modify the link to 'guestbook.html' (e.g., \`<a href="guestbook.html">Sign my Guestbook!</a>\`) on any of the user's HTML pages. You can move, add, or restyle this link, but you must not delete an existing link unless the user explicitly tells you to.
-- **File Creation:** You CAN create new files. If a user asks for a new page (e.g., 'about.html'), add it to the 'fileChanges' array.
-- **File Limits:** The user's site is limited to 25 files. If a request would create files that exceed this limit, you must refuse and state the reason in 'responseMessage'.`;
-
-  const responseSchema = {
-    type: Type.OBJECT,
-    properties: {
-      responseMessage: { type: Type.STRING },
-      fileChanges: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            filePath: { type: Type.STRING },
-            content: { type: Type.STRING }
-          },
-          required: ['filePath', 'content']
-        }
-      },
-      requiredImages: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            fileName: { type: Type.STRING },
-            description: { type: Type.STRING }
-          },
-          required: ['fileName', 'description']
-        }
-      }
-    },
-    required: ['responseMessage', 'fileChanges', 'requiredImages']
-  };
-
-  const fullPrompt = `The user's username is '${username}' and their neighborhood is '${neighborhoodCode}'.
-The user's complete file structure is:
-\`\`\`json
-${JSON.stringify(fileTree)}
-\`\`\`
-
-The conversation history so far is:
-\`\`\`json
-${JSON.stringify(chatHistory)}
-\`\`\`
-
-The user's new request is: "${userPrompt}"
-
-Analyze the request and provide the necessary file changes in the specified JSON format.`;
-
+  // 2. Delegate to the AI Service
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: fullPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: 'application/json',
-        responseSchema: responseSchema
-      }
+    const aiResponse = await aiService.getAiResponse({
+      userPrompt,
+      chatHistory,
+      fileTree,
+      username,
+      neighborhoodCode
     });
-
-    console.log(`${LOG_PREFIX} Gemini call successful.`);
-    res.json({ success: true, content: JSON.parse(response.text) });
+    res.json({ success: true, content: aiResponse });
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error calling Gemini API:`, error);
+    // The service layer will have already logged the detailed error.
+    // We just need to send a user-friendly response.
     res.status(500).json({
       success: false,
-      message: `Server-side error calling Gemini API: ${error.message}`
+      message: `An error occurred while communicating with the AI assistant: ${error.message}`
     });
   }
 });

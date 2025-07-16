@@ -350,10 +350,15 @@ window.GeoFire.components.portal = (function () {
   }
 
   function renderInfoBar() {
+    var registerHtml = '';
+    if (!G.state.loggedInSiteData) {
+      registerHtml =
+        '<div style="float:right; margin:5px 0;">' +
+        '<a id="register-link" href="#"><b>Get a free home page &gt;</b></a>' +
+        '</div><div style="clear:both;"></div>';
+    }
     return (
-      '<div style="float:right; margin:5px 0;">' +
-      '<a id="register-link" href="#"><b>Get a free home page &gt;</b></a>' +
-      '</div><div style="clear:both;"></div>' +
+      registerHtml +
       '<div class="info-bar">' +
       'Returning GeoFire members, learn how to <b>sign in for the first time.</b>' +
       '</div>'
@@ -457,7 +462,12 @@ window.GeoFire.components.portal = (function () {
       document.getElementById('cta-edit').onclick = ctaEdit;
       document.getElementById('cta-upload').onclick = ctaUpload;
 
-      document.getElementById('register-link').onclick = navToRegister;
+      // Add a null check to make this more robust
+      var registerLink = document.getElementById('register-link');
+      if (registerLink) {
+        registerLink.onclick = navToRegister;
+      }
+
       var searchForm = document.getElementById('search-form');
       if (searchForm) searchForm.onsubmit = handleSearch;
     },

@@ -70,5 +70,11 @@ module.exports = {
         ]
       }
     }
+  },
+  flashplayer: {
+    name: 'Flash Player',
+    description:
+      'Enables support for Macromedia Flash (.swf) animations and applications. This allows the AI to embed .swf files from your /flash directory.',
+    module: 'flashplayer.js'
   }
 };

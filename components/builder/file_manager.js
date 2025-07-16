@@ -33,6 +33,7 @@ window.GeoFire.components = window.GeoFire.components || {};
       var itemFullPath = currentPath ? currentPath + '/' + item.name : item.name;
 
       var lowerCaseName = item.name.toLowerCase();
+      var isSwfFile = lowerCaseName.endsWith('.swf');
       var imageExtensions = ['.gif', '.jpg', '.jpeg', '.png'];
       var isImageFile = false;
       for (var j = 0; j < imageExtensions.length; j++) {
@@ -50,12 +51,17 @@ window.GeoFire.components = window.GeoFire.components || {};
       var icon =
         item.type === 'directory'
           ? '/assets/images/folder_icon.gif'
+          : isSwfFile
+          ? '/assets/images/plugin_icon.gif'
           : isImageFile
           ? '/assets/images/image_icon.gif'
           : '/assets/images/text_icon.gif';
 
       var linkClass =
-        itemFullPath === G.state.activeFilePath && item.type === 'file' && !isImageFile
+        itemFullPath === G.state.activeFilePath &&
+        item.type === 'file' &&
+        !isImageFile &&
+        !isSwfFile
           ? 'style="background:#000080; color:#fff; text-decoration: none;"'
           : 'class="file-explorer-link"';
       var dataAction = item.type === 'file' ? 'data-action="edit"' : 'data-action="nav"';
@@ -103,8 +109,7 @@ window.GeoFire.components = window.GeoFire.components || {};
       buttons += '<button id="fm-new-folder-button" class="retro-button">New Folder</button> ';
     }
 
-    if (currentPath === 'images' || currentPath === 'sounds') {
-      var fileTypes = currentPath === 'images' ? '.gif,.jpg,.jpeg' : '.mid,.midi';
+    if (currentPath === 'images' || currentPath === 'sounds' || currentPath === 'flash') {
       buttons += '<button id="fm-upload-button" class="retro-button">Upload File</button>';
       // The form and input will be part of the layout now for the iframe target technique
     }
@@ -180,6 +185,14 @@ window.GeoFire.components = window.GeoFire.components || {};
       refresh();
     } else if (action === 'edit') {
       var lowerCasePath = path.toLowerCase();
+
+      if (lowerCasePath.endsWith('.swf')) {
+        G.utils.showNotification(
+          'Flash files (.swf) cannot be previewed directly.\n\nPlease ask the AI Assistant to embed the file onto an HTML page, then use the "Refresh Preview" button to see it in action.'
+        );
+        return false;
+      }
+
       var imageExtensions = ['.gif', '.jpg', '.jpeg', '.png'];
       var isImage = false;
       for (var i = 0; i < imageExtensions.length; i++) {

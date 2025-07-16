@@ -16,10 +16,10 @@ This project runs as a full-stack application with a Node.js backend and a vanil
 
 ## ✨ Showcase
 
-_(This is a great place to add a few screenshots of the GeoFire '99 portal and the AI Site Builder in action!)_
+These diagrams provide a high-level overview of the application's sophisticated architecture and AI workflow.
 
-![Screenshot Placeholder 1](https://via.placeholder.com/800x450.png?text=Portal+Page+Screenshot)
-![Screenshot Placeholder 2](https://via.placeholder.com/800x450.png?text=Site+Builder+Screenshot)
+![Application Architecture](https://storage.googleapis.com/aistudio-hosting/geofire/architecture_diagram.png)
+![AI Workflow](https://storage.googleapis.com/aistudio-hosting/geofire/workflow_diagram.png)
 
 ## 🚀 Features
 
@@ -33,10 +33,15 @@ _(This is a great place to add a few screenshots of the GeoFire '99 portal and t
   - Web Rings to link to your neighbors
   - Background MIDI music
   - Animated Mouse Trails (Matrix, Sparkles, and more!)
+  - **Flash Player:** Full support for embedding classic Macromedia Flash (.swf) animations and applications.
 - **Full User Account System:** Register, log in, and manage your own retro website in one of GeoFire's themed "neighborhoods."
 - **File System Backend:** User sites are stored directly on your local file system, making it easy to see the files the AI creates.
 - **Live Site Hosting:** The Node.js server hosts your created sites, making them accessible in your browser just like a real web host.
 - **Site Discovery:** Browse and explore all user-created sites within the application.
+
+## 📖 Architectural Deep Dive
+
+For a detailed look at the application's architecture, AI orchestration, and retro-compatibility strategies, please see our [**Technical Deep Dive Document**](./GeoFire99_Technical_Deep_Dive.md).
 
 ## 🛠️ Technology Stack
 
@@ -44,7 +49,7 @@ _(This is a great place to add a few screenshots of the GeoFire '99 portal and t
 - **Frontend:** Vanilla JavaScript (ES3/IE6 Compatible), HTML 4.01 Transitional, CSS1/CSS2
 - **AI Integration:** Google Gemini API (`@google/genai`)
 - **Data Storage:** Local file system with JSON for metadata.
-- **Dependencies:** `body-parser`, `cors`, `dotenv`, `multer`
+- **Dependencies:** `@google/genai`, `bcrypt`, `body-parser`, `cors`, `dotenv`, `express`, `multer`
 
 ## ✅ Prerequisites
 
