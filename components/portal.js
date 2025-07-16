@@ -300,8 +300,9 @@ window.GeoFire.components.portal = (function () {
 
   function renderHelpBox() {
     var content =
-      'If you need help getting started or have other questions, visit our <a href="#">Help</a> section for frequently asked questions and tutorials.';
-    return renderContentBox('Getting Help', content, 'green');
+      'If you need help getting started or have other questions, visit our <a href="/help">Help</a> section for frequently asked questions and tutorials.';
+    var title = '<a href="/help" style="color:white; text-decoration:none;">Getting Help</a>';
+    return renderContentBox(title, content, 'green');
   }
 
   function renderPageHeader() {
@@ -360,7 +361,7 @@ window.GeoFire.components.portal = (function () {
     return (
       registerHtml +
       '<div class="info-bar">' +
-      'Returning GeoFire members, learn how to <b>sign in for the first time.</b>' +
+      'Returning GeoFire members, learn how to <a href="/help?topic=first-signin"><b>sign in for the first time.</b></a>' +
       '</div>'
     );
   }

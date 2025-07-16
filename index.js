@@ -138,6 +138,9 @@ window.GeoFire = window.GeoFire || {};
       case 'corporate-news':
         pageContent = G.components.news.render();
         break;
+      case 'help':
+        pageContent = G.components.help.render();
+        break;
       case 'search':
         pageContent = G.components.common.renderRetroWindow(
           'Search',
@@ -166,6 +169,8 @@ window.GeoFire = window.GeoFire || {};
       G.components.portal.attachRegistrationEvents();
     } else if (G.state.view === 'news' || G.state.view === 'corporate-news') {
       G.components.news.attachEvents();
+    } else if (G.state.view === 'help') {
+      G.components.help.attachEvents();
     }
     // Always attach header events
     G.components.portal.attachHeaderEvents();
@@ -266,6 +271,8 @@ window.GeoFire = window.GeoFire || {};
             G.state.view = 'news';
           } else if (path.indexOf('/corporate-news') === 0) {
             G.state.view = 'corporate-news';
+          } else if (path.indexOf('/help') === 0) {
+            G.state.view = 'help';
           } else if (pathParts.length === 2 && pathParts[0] === 'neighborhood') {
             G.state.view = 'neighborhood';
             G.state.params.code = pathParts[1];
