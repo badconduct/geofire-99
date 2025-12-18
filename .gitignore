@@ -21,7 +21,6 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-.env
 # directories
 /node_modules/
 /user_sites/
