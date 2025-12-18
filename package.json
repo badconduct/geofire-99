@@ -20,7 +20,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "@google/genai": "^1.8.0",
+    "@google/genai": "^2.1.0",
     "multer": "^1.4.5-lts.1"
+  },
+  "overrides": {
+    "glob": "^10.0.0",
+    "rimraf": "^5.0.0",
+    "npmlog": "^7.0.0",
+    "are-we-there-yet": "^4.0.0",
+    "gauge": "^5.0.0"
   }
 }
